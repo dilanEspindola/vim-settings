@@ -3,17 +3,27 @@
 call plug#begin('~/AppData/Local/nvim/plugged')
 Plug	'EdenEast/nightfox.nvim'
 Plug	'olimorris/onedarkpro.nvim'
+Plug    'sainnhe/gruvbox-material'
 Plug	'neovim/nvim-lspconfig'
 Plug	'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
 Plug 	'pangloss/vim-javascript'    " JavaScript support
+Plug    'mxw/vim-jsx'
 Plug 	'leafgarland/typescript-vim' " TypeScript syntax
 Plug    'ryanoasis/vim-devicons'
 Plug    'maxmellon/vim-jsx-pretty'
 Plug 	'grvcoelho/vim-javascript-snippets'
 Plug    'mattn/emmet-vim'
+Plug    'jiangmiao/auto-pairs'
+Plug    'alvan/vim-closetag'
+Plug    'peitalin/vim-jsx-typescript'
+Plug    'tpope/vim-commentary'
+Plug    'Yggdroot/indentLine'
+Plug    'vim-airline/vim-airline'
+Plug    'preservim/nerdtree'
 "Plug    'SirVer/ultisnips' 
 "Plug    'mlaursen/vim-react-snippets'
 call plug#end()
+
 
 "configuraciones globales
 set number 		"muestra los numeros de cada linea en la parte izquierda
@@ -27,8 +37,11 @@ set clipboard=unnamed	"para poder utilizar el portapapeles del sistema operativo
 set showcmd		"muestra los atajos del teclado presionados
 set showmatch		"si tenemos un parentesis o corchete nos muestra donde termina
 set completeopt=menu,menuone,noselect
+" set syntax=on
 
 "configuracion del tema
+" set background=dark
+" let g:gruvbox_material_background='medium'
 colorscheme onedarkpro
 
 "snippets config
@@ -41,10 +54,87 @@ let g:user_emmet_settings={
 	  \ }
   \ }
 
+" comments conf
+nnoremap <space>} :Commentary<CR>
 
 "prettier conf
 command! -nargs=0 Prettier :CocCommand prettier.formatFile
 nnoremap <C-D> :Prettier<CR>
+
+" airine conf
+let g:airline#extensions#tabline#enabled = 1
+
+" nerdtree conf
+" nnoremap <leader>n :NERDTreeFocus<CR>
+nnoremap <silent> <C-b> :NERDTreeFind<CR>
+nnoremap <silent> <C-n> :NERDTreeToggle<CR>
+
+" it shows me documentation 
+function! ShowDocIfNoDiagnostic(timer_id)
+  if (coc#float#has_float() == 0 && CocHasProvider('hover') == 1)
+    silent call CocActionAsync('doHover')
+  endif
+endfunction
+
+function! s:show_hover_doc()
+  call timer_start(500, 'ShowDocIfNoDiagnostic')
+endfunction
+
+autocmd CursorHoldI * :call <SID>show_hover_doc()
+autocmd CursorHold * :call <SID>show_hover_doc()
+
+" set filetypes as typescriptreact
+autocmd BufNewFile,BufRead *.tsx,*.jsx set filetype=typescriptreact
+
+"vim jsx
+let g:jsx_ext_required = 1
+let g:jsx_pragma_required = 1
+
+"closetag conf
+
+" filenames like *.xml, *.html, *.xhtml, ...
+" These are the file extensions where this plugin is enabled.
+"
+let g:closetag_filenames = '*.html,*.xhtml,*.phtml'
+
+" filenames like *.xml, *.xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filenames = '*.xhtml,*.jsx'
+
+" filetypes like xml, html, xhtml, ...
+" These are the file types where this plugin is enabled.
+"
+let g:closetag_filetypes = 'html,xhtml,phtml'
+
+" filetypes like xml, xhtml, ...
+" This will make the list of non-closing tags self-closing in the specified files.
+"
+let g:closetag_xhtml_filetypes = 'xhtml,jsx'
+
+" integer value [0|1]
+" This will make the list of non-closing tags case-sensitive (e.g. `<Link>` will be closed while `<link>` won't.)
+"
+let g:closetag_emptyTags_caseSensitive = 1
+
+" dict
+" Disables auto-close if not in a "valid" region (based on filetype)
+"
+let g:closetag_regions = {
+    \ 'typescript.tsx': 'jsxRegion,tsxRegion',
+    \ 'javascript.jsx': 'jsxRegion',
+    \ 'typescriptreact': 'jsxRegion,tsxRegion',
+    \ 'javascriptreact': 'jsxRegion',
+    \ }
+
+" Shortcut for closing tags, default is '>'
+"
+let g:closetag_shortcut = '>'
+
+" Add > at current position without closing the current tag, default is ''
+"
+let g:closetag_close_shortcut = '<leader>>'
+
 
 "LSP configuracion
 lua << EOF
